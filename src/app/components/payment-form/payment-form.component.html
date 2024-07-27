@@ -1,8 +1,17 @@
 <form id="authForm">
-    <input type="hidden" id="captureContext" name="captureContext" [(ngModel)]="captureContext">
-    <input type="hidden" id="transientToken" name="transientToken" [(ngModel)]="transientToken">
-    <div id="buttonPaymentListContainer"></div>
-    <div id="embeddedPaymentContainer"></div>
-    <button type="button" (click)="submitPayment()">Submit Payment</button>
-  </form>
-  
+  <input
+    type="hidden"
+    id="captureContext"
+    name="captureContext"
+    [(ngModel)]="captureContext"
+  />
+  <input
+    type="hidden"
+    id="transientToken"
+    name="transientToken"
+    [(ngModel)]="transientToken"
+  />
+  <div id="buttonPaymentListContainer"></div>
+  <div id="embeddedPaymentContainer"></div>
+  <button type="button" (click)="submitPayment()">Submit Payment</button>
+</form>

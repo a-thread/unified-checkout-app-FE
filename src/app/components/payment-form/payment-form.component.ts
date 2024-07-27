@@ -16,15 +16,14 @@ declare var Accept: any;
     PaymentSessionService
   ],
   templateUrl: './payment-form.component.html',
-  styleUrl: './payment-form.component.scss'
 })
-export class PaymentFormComponent  implements OnInit {
+export class PaymentFormComponent implements OnInit {
   captureContext: string = '';
-  transientToken: string= '';
+  transientToken: string = '';
 
   constructor(
     private paymentSessionService: PaymentSessionService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.createPaymentSession();
