@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class PaymentSessionService {
-  private apiUrl = `${environment.apiUrl}/create-payment-session`; // Your .NET endpoint
+  private apiUrl = `${environment.apiUrl}/Payment`
 
   constructor(private http: HttpClient) {}
 
@@ -17,6 +17,8 @@ export class PaymentSessionService {
       allowedCardNetworks: ["VISA", "MASTERCARD", "AMEX"],
       clientVersion: "v2.0"
     };
-    return this.http.post<any>(this.apiUrl, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}/create-session`,
+      payload);
   }
 }
