@@ -15,19 +15,8 @@ export class PaymentSessionService {
 
   constructor(private http: HttpClient) { }
 
-  createSession(
-    targetOrigins: string[] = ["https://www.example.com"],
-    allowedCardNetworks: string[] =  ["VISA", "MASTERCARD", "AMEX"],
-  ): Observable<CaptureContext> {
-    const payload = {
-      targetOrigins,
-      allowedCardNetworks,
-      clientVersion: "v2.0"
-    };
-    return this.http.post<any>(
-      `${this.apiUrl}/create-session`,
-      payload
-    ).pipe(
+  createSession(): Observable<CaptureContext> {
+    return this.http.get<{captureContext: string}>(`${this.apiUrl}/create-session`).pipe(
       map(response => {
         const captureContext = JSON.parse(atob(response.captureContext)) as CaptureContext;
         return captureContext;

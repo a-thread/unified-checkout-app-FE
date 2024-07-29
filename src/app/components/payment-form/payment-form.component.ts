@@ -14,20 +14,19 @@ declare var Accept: any;
   providers: [PaymentSessionService],
 })
 export class PaymentFormComponent implements OnInit {
-  captureContext: CaptureContext | null = null;
-  transientToken: string = '';
 
   constructor(private paymentSessionService: PaymentSessionService) {}
 
   ngOnInit(): void {
+    // create new session as soon as we load the component
     this.createPaymentSession();
   }
 
   createPaymentSession(): void {
     this.paymentSessionService.createSession().subscribe({
       next: (captureContext) => {
-        this.captureContext = captureContext;
-        this.loadAcceptJs(captureContext.clientLibrary);
+        // dynamically loading the javascript libary
+        this.loadClientLibrary(captureContext);
       },
       error: (error) => {
         console.error('Error creating payment session:', error);
@@ -35,21 +34,24 @@ export class PaymentFormComponent implements OnInit {
     });
   }
 
-  loadAcceptJs(url: string): void {
+  loadClientLibrary(captureContext: CaptureContext): void {
     const script = document.createElement('script');
-    script.src = url;
+    script.src = captureContext?.clientLibrary || '';
+    // if we load the clientLibrary successfully
     script.onload = () => {
-      console.log('Accept.js loaded successfully');
+      console.log('clientLibrary loaded successfully');
+      // we can load the embedded UI
+      this.loadEmbeddedComponent(captureContext);
     };
     script.onerror = () => {
-      console.error('Failed to load Accept.js');
+      console.error('Failed to load clientLibrary');
     };
     document.head.appendChild(script);
   }
 
-  submitPayment(): void {
-    if (this.captureContext && typeof Accept !== 'undefined') {
-      Accept(this.captureContext)
+  loadEmbeddedComponent(captureContext: CaptureContext): void {
+    if (typeof Accept !== 'undefined') {
+      Accept(captureContext)
         .then((accept: any) => accept.unifiedPayments())
         .then((up: any) =>
           up.show({
@@ -59,25 +61,23 @@ export class PaymentFormComponent implements OnInit {
             },
           })
         )
-        .then((tt: any) => {
-          this.transientToken = tt;
-          console.log('Transient Token:', this.transientToken);
-          this.paymentSessionService
-            .processPayment(this.transientToken)
-            .subscribe({
-              next: (response) => {
-                console.log('Payment processed successfully:', response);
-              },
-              error: (error) => {
-                console.error('Error processing payment:', error);
-              },
-            });
-        })
+        .then((tt: string) => this.sendSecureInfoToBE(tt))
         .catch((error: any) => {
           alert('Something went wrong: ' + error.message);
         });
     } else {
       console.error('Accept is not defined');
     }
+  }
+
+  sendSecureInfoToBE(transientToken: string): void {
+    this.paymentSessionService.processPayment(transientToken).subscribe({
+      next: (response) => {
+        console.log('Payment processed successfully:', response);
+      },
+      error: (error) => {
+        console.error('Error processing payment:', error);
+      },
+    });
   }
 }
